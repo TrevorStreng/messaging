@@ -1,0 +1,31 @@
+package application;
+
+import javafx.application.Application;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
+
+public class UsernameInput extends Application {
+	Stage usernameStage = new Stage();
+	public UsernameInput() {
+		
+	}
+	
+	@Override
+	public void start(Stage usernameStage) {
+		
+	    TextArea getUsername = new TextArea();
+	    getUsername.setEditable(false);
+	    TextField usernameInput = new TextField();
+	    Button submitUsername = new Button("Submit");
+	    
+	    VBox usernameLayout = new VBox(6, getUsername, usernameInput, submitUsername);
+	    Scene usernameScene = new Scene(usernameLayout, 200, 200);
+	    
+	    usernameStage.setScene(usernameScene);
+	    usernameStage.show();
+	}
+}

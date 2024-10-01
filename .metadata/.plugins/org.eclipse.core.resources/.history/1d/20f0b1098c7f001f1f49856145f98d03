@@ -1,0 +1,82 @@
+package Client;
+
+import java.io.*;
+import java.net.*;
+import java.util.Scanner;
+
+public class Client {
+	private Socket socket;
+	private BufferedReader reader;
+	private PrintWriter writer;
+	private String username;
+	
+	public Client(String address, int port) {
+		try {
+			socket = new Socket(address, port);
+			System.out.println("Connected to the chat server!");
+			
+			OutputStream output = socket.getOutputStream();
+			writer = new PrintWriter(output, true);
+			
+			InputStream input = socket.getInputStream();
+			reader = new BufferedReader(new InputStreamReader(input));
+			
+			new Thread(new ReadThread()).start();
+			
+			handleSendingMessage();
+		} catch(UnknownHostException e) {
+			System.out.println("Sever not found: " + e.getMessage());
+		} catch(IOException e) {
+			System.out.println("I/O error: " + e.getMessage());
+		}
+	}
+	
+	private void handleSendingMessage() {
+		Scanner scanner = new Scanner(System.in);
+		
+		try {
+			System.out.println("Enter username here: ");
+			username = scanner.nextLine();
+			writer.println(username);
+			
+			String message;
+			do {
+				System.out.println("[" + username + "]: ");
+				message = scanner.nextLine();
+				
+				writer.println(message);
+			} while(!message.equalsIgnoreCase("exit"));
+			
+		} finally {
+			scanner.close();
+		}
+		
+		try {
+			socket.close();
+		} catch(IOException e) {
+			System.out.println("Error closing connection: " + e.getMessage());
+		}
+	}
+
+	private class ReadThread implements Runnable {
+		@Override
+		public void run() {
+			try {
+				String serverMessage;
+				while((serverMessage = reader.readLine()) != null) {
+					System.out.println(serverMessage);
+				}
+			} catch(IOException e) {
+				System.out.println("Error reading from the sever: " + e.getMessage());
+			}
+		}
+	}
+
+	public static void main(String[] args) {
+		String hostname = "localhost";
+		int port = 1234;
+		
+		new Client(hostname, port);
+	}
+
+}

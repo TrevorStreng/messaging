@@ -1,0 +1,49 @@
+package application;
+	
+import Client.Client;
+import javafx.application.Application;
+import javafx.stage.Stage;
+import javafx.scene.Scene;
+import javafx.scene.control.*;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.VBox;
+
+
+public class Main extends Application {
+	@Override
+	public void start(Stage primaryStage) {
+		try {
+	        // Create UI components
+	        TextArea messageDisplay = new TextArea();
+	        messageDisplay.setEditable(false);
+	        TextField messageInput = new TextField();
+	        Button sendButton = new Button("Send");
+
+	        // Layout
+	        VBox layout = new VBox(10, messageDisplay, messageInput, sendButton);
+	        Scene scene = new Scene(layout, 400, 300);
+
+	        // Setup Stage
+	        primaryStage.setScene(scene);
+	        primaryStage.setTitle("Private Messaging App");
+	        primaryStage.show();
+	        
+	        new UsernameInput();	        // Event handling for sending messages
+//			String hostname = "localhost";
+//			int port = 1234;
+//	        Client client = new Client(hostname, port);
+	        sendButton.setOnAction(e -> {
+	        String message = messageInput.getText();
+//	        client.sendMessage(message);
+	        messageDisplay.appendText("You: " + message + "\n");
+	        messageInput.clear();
+	        });
+	        } catch(Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public static void main(String[] args) {
+		launch(args);		
+	}
+}
