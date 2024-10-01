@@ -1,0 +1,73 @@
+package application;
+	
+import javafx.application.Application;
+import javafx.stage.Stage;
+import javafx.scene.Scene;
+import javafx.scene.control.*;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.VBox;
+
+
+public class Main extends Application {
+	@Override
+	public void start(Stage primaryStage) {
+		try {
+	        // Create UI components
+	        TextArea messageDisplay = new TextArea();
+	        messageDisplay.setEditable(false);
+	        TextField messageInput = new TextField();
+	        Button sendButton = new Button("Send");
+
+	        // Layout
+	        VBox layout = new VBox(10, messageDisplay, messageInput, sendButton);
+	        Scene scene = new Scene(layout, 400, 300);
+
+	        // Setup Stage
+	        primaryStage.setScene(scene);
+	        primaryStage.setTitle("Private Messaging App");
+	        primaryStage.show();
+	        
+	        
+	        usernameInputWindow(new Stage());
+	        
+	        // Event handling for sending messages
+	        sendButton.setOnAction(e -> {
+	        String message = messageInput.getText();
+	        messageDisplay.appendText("You: " + message + "\n");
+	        messageInput.clear();
+	        });
+	        } catch(Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	private void usernameInputWindow(Stage parentStage) {
+	    TextField usernameInput = new TextField();
+	    Button submitButton = new Button("Submit");
+	    
+	    VBox usernameLayout = new VBox(6, usernameInput, submitButton);
+	    Scene usernameScene = new Scene(usernameLayout, 200, 200);
+	    
+	    submitButton.setOnAction(e -> {
+	    	String username = usernameInput.getText();
+	    	if(!Server.checkIfAvailable(username)) {
+	    		Stage unavailable = new Stage();
+	    		TextField error = new TextField();
+	    		Button okayButton = new Button("Okay");
+	    		
+	    		VBox errorLayout = new VBox(6, error, okayButton);
+	    		Scene errorScene = new Scene(errorLayout, 50, 50);
+	    	} else {
+	    		new Client("localhost", 1234, username);
+	    		parentStage.close();
+	    	}
+	    });
+	    
+	    parentStage.setScene(usernameScene);
+	    parentStage.show();
+	}
+	
+	public static void main(String[] args) {
+		launch(args);		
+	}
+}

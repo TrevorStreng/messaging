@@ -33,12 +33,8 @@ public class Main extends Application {
 	        usernameInputWindow(new Stage());
 	        
 	        // Event handling for sending messages
-//			String hostname = "localhost";
-//			int port = 1234;
-//	        Client client = new Client(hostname, port);
 	        sendButton.setOnAction(e -> {
 	        String message = messageInput.getText();
-//	        client.sendMessage(message);
 	        messageDisplay.appendText("You: " + message + "\n");
 	        messageInput.clear();
 	        });
