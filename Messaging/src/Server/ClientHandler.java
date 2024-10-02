@@ -22,24 +22,30 @@ class ClientHandler implements Runnable {
 			OutputStream output = socket.getOutputStream();
 			writer = new PrintWriter(output, true);
 			
-			writer.println("Enter your username:");
-			username = reader.readLine();
-			Server.addUser(username, this);
-			
+			String reqUsername = reader.readLine();
+			if(Server.checkIfAvailable(reqUsername)) {
+				System.out.println("avail");
+				writer.println("USERNAME_AVAILABLE");
+				this.username = reqUsername;
+				Server.addUser(username, this);
+			} else {
+				writer.println("USERNAME_TAKEN");
+			}
+		
 			Server.broadcast(username + " has joined this chat", this);
 			
+		
 			String clientMessage;
 			while((clientMessage = reader.readLine()) != null) {
 				handleMessage(clientMessage);
 			}
 		} catch(IOException e) {
 			System.out.println("Error: " + e.getMessage());
-		} finally {
-			closeConnection();
 		}
 	}
 
 	private void handleMessage(String message) {
+		System.out.println("HandleMessage: " + message);
 		String[] tokens = message.split(" ", 3);
 		String recipient = tokens[0];
 		String dm = tokens[1];

@@ -4,17 +4,19 @@ import java.io.*;
 import java.net.*;
 import java.util.Scanner;
 
+import Server.Server;
+
 public class Client {
 	private Socket socket;
 	private BufferedReader reader;
 	private PrintWriter writer;
 	private String username;
+	private boolean isUsernameTaken = true;
 	
 	public Client(String address, int port, String username) {
-		this.username = username;
 		try {
-			socket = new Socket(address, port);
-			System.out.println("Connected to the chat server!");
+			this.socket = new Socket(address, port);
+			this.username = username;
 			
 			OutputStream output = socket.getOutputStream();
 			writer = new PrintWriter(output, true);
@@ -22,14 +24,46 @@ public class Client {
 			InputStream input = socket.getInputStream();
 			reader = new BufferedReader(new InputStreamReader(input));
 			
-			new Thread(new ReadThread()).start();
+			writer.println(username);
 			
-			handleSendingMessage();
+			String usernameAvailable = reader.readLine();
+			if("USERNAME_AVAILABLE".equals(usernameAvailable)) {
+				System.out.println("username is still available");
+				isUsernameTaken = false;
+			} else if("USERNAME_TAKEN".equals(usernameAvailable)) {
+				System.out.println("Username is already taken.");
+				socket.close();
+			}
+			
+			if(!isUsernameTaken) new Thread(this::listenForMessages).start();
+			
+			
+//			handleSendingMessage();
 		} catch(UnknownHostException e) {
 			System.out.println("Sever not found: " + e.getMessage());
 		} catch(IOException e) {
 			System.out.println("I/O error: " + e.getMessage());
 		}
+	}
+	
+    public boolean getIsUsernameTaken() {
+    	System.out.println(isUsernameTaken);
+        return isUsernameTaken;
+    }
+	
+	private void listenForMessages() {
+		String message;
+		try {
+			while((message = reader.readLine()) != null) {
+				System.out.println(message);
+			}
+		} catch(IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public void sendMessage(String message) {
+		writer.println(message);
 	}
 	
 	private void handleSendingMessage() {

@@ -1,0 +1,47 @@
+package Server;
+
+import java.io.*;
+import java.net.*;
+import java.util.*;
+
+public class Server {
+	private static Map<String, ClientHandler> activeUsers = new HashMap<>();
+	private static int port = 1234;
+
+	public static void main(String[] args) {
+		try(ServerSocket serverSocket = new ServerSocket(port)) {
+			System.out.println("Server is running on port " + port);
+			
+			while(true) {
+				Socket socket = serverSocket.accept();
+				new Thread(new ClientHandler(socket)).start();
+			}
+		} catch(IOException e) {
+			System.out.println("Server error: " + e.getMessage());
+		}
+	}
+	
+	public static void addUser(String username, ClientHandler clientHandler) {
+		System.out.println("adding: " + username);
+		activeUsers.put(username, clientHandler);
+	}
+	public static void removeUser(String username) {
+		activeUsers.remove(username);		
+	}
+	public static synchronized ClientHandler getUserHandler(String username) {
+		return activeUsers.get(username);
+	}
+	public static boolean checkIfAvailable(String username) {
+		return !activeUsers.containsKey(username);
+	}
+	public static Set<String> getActiveUsers() {
+	    return activeUsers.keySet();
+	}
+
+	public static synchronized void broadcast(String message, ClientHandler clientHandler) {
+		for(ClientHandler user : activeUsers.values()) {
+			user.sendMessage(message);
+		}
+	}
+
+}

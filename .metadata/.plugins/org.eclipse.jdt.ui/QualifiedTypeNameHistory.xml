@@ -3,6 +3,8 @@
     <fullyQualifiedTypeName name="javafx.scene.control.TextArea"/>
     <fullyQualifiedTypeName name="javafx.application.Application"/>
     <fullyQualifiedTypeName name="javafx.stage.Stage"/>
-    <fullyQualifiedTypeName name="Server.Server"/>
     <fullyQualifiedTypeName name="Client.Client"/>
+    <fullyQualifiedTypeName name="java.util.Set"/>
+    <fullyQualifiedTypeName name="Server.Server"/>
+    <fullyQualifiedTypeName name="javafx.scene.text.Text"/>
 </qualifiedTypeNameHistroy>

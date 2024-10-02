@@ -23,6 +23,7 @@ public class Server {
 	
 	public static void addUser(String username, ClientHandler clientHandler) {
 		activeUsers.put(username, clientHandler);
+		System.out.println("Active: " + getActiveUsers());
 	}
 	public static void removeUser(String username) {
 		activeUsers.remove(username);		
@@ -32,6 +33,9 @@ public class Server {
 	}
 	public static boolean checkIfAvailable(String username) {
 		return !activeUsers.containsKey(username);
+	}
+	public static Set<String> getActiveUsers() {
+	    return activeUsers.keySet();
 	}
 
 	public static synchronized void broadcast(String message, ClientHandler clientHandler) {

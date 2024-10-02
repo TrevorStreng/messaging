@@ -1,5 +1,7 @@
 package application;
 	
+import java.util.Set;
+
 import Client.Client;
 import Server.Server;
 import javafx.application.Application;
@@ -8,9 +10,11 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Text;
 
 
 public class Main extends Application {
+	private Client client;
 	@Override
 	public void start(Stage primaryStage) {
 		try {
@@ -22,7 +26,7 @@ public class Main extends Application {
 
 	        // Layout
 	        VBox layout = new VBox(10, messageDisplay, messageInput, sendButton);
-	        Scene scene = new Scene(layout, 400, 300);
+	        Scene scene = new Scene(layout, 800, 700);
 
 	        // Setup Stage
 	        primaryStage.setScene(scene);
@@ -36,6 +40,7 @@ public class Main extends Application {
 	        sendButton.setOnAction(e -> {
 	        String message = messageInput.getText();
 	        messageDisplay.appendText("You: " + message + "\n");
+	        client.sendMessage(message);
 	        messageInput.clear();
 	        });
 	        } catch(Exception e) {
@@ -52,15 +57,25 @@ public class Main extends Application {
 	    
 	    submitButton.setOnAction(e -> {
 	    	String username = usernameInput.getText();
-	    	if(!Server.checkIfAvailable(username)) {
+	    	System.out.println(username);
+	    	client = new Client("localhost", 1234, username);
+	    	
+	    	// check if username is in use and display an error message if it is
+	    	if(client.getIsUsernameTaken()) {
 	    		Stage unavailable = new Stage();
-	    		TextField error = new TextField();
+	    		Text error = new Text(50, 50, "Username unavailable..");
 	    		Button okayButton = new Button("Okay");
 	    		
 	    		VBox errorLayout = new VBox(6, error, okayButton);
 	    		Scene errorScene = new Scene(errorLayout, 50, 50);
+	    		
+	    		okayButton.setOnAction(l -> {
+	    			unavailable.close();
+	    		});
+	    		
+	    		unavailable.setScene(errorScene);
+	    		unavailable.show();
 	    	} else {
-	    		new Client("localhost", 1234, username);
 	    		parentStage.close();
 	    	}
 	    });
