@@ -12,11 +12,13 @@ public class Client {
 	private PrintWriter writer;
 	private String username;
 	private boolean isUsernameTaken = true;
+	private MessageListener messageListener;
 	
-	public Client(String address, int port, String username) {
+	public Client(String address, int port, String username, MessageListener listener) {
 		try {
 			this.socket = new Socket(address, port);
 			this.username = username;
+			this.messageListener = listener;
 			
 			OutputStream output = socket.getOutputStream();
 			writer = new PrintWriter(output, true);
@@ -38,7 +40,6 @@ public class Client {
 			if(!isUsernameTaken) new Thread(this::listenForMessages).start();
 			
 			
-//			handleSendingMessage();
 		} catch(UnknownHostException e) {
 			System.out.println("Sever not found: " + e.getMessage());
 		} catch(IOException e) {
@@ -55,7 +56,8 @@ public class Client {
 		String message;
 		try {
 			while((message = reader.readLine()) != null) {
-				System.out.println(message);
+				System.out.println("received: " + message);
+				messageListener.onMessageReceived(message);
 			}
 		} catch(IOException e) {
 			e.printStackTrace();
@@ -65,53 +67,4 @@ public class Client {
 	public void sendMessage(String message) {
 		writer.println(message);
 	}
-	
-	private void handleSendingMessage() {
-		Scanner scanner = new Scanner(System.in);
-		
-		try {
-			System.out.println("Enter username here: ");
-			username = scanner.nextLine();
-			writer.println(username);
-			
-			String message;
-			do {
-				System.out.println("[" + username + "]: ");
-				message = scanner.nextLine();
-				
-				writer.println(message);
-			} while(!message.equalsIgnoreCase("exit"));
-			
-		} finally {
-			scanner.close();
-		}
-		
-		try {
-			socket.close();
-		} catch(IOException e) {
-			System.out.println("Error closing connection: " + e.getMessage());
-		}
-	}
-
-	private class ReadThread implements Runnable {
-		@Override
-		public void run() {
-			try {
-				String serverMessage;
-				while((serverMessage = reader.readLine()) != null) {
-					System.out.println(serverMessage);
-				}
-			} catch(IOException e) {
-				System.out.println("Error reading from the sever: " + e.getMessage());
-			}
-		}
-	}
-
-//	public static void main(String[] args) {
-//		String hostname = "localhost";
-//		int port = 1234;
-//		
-//		new Client(hostname, port);
-//	}
-
 }

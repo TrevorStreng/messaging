@@ -1,0 +1,123 @@
+package Client;
+
+import java.io.*;
+import java.net.*;
+import java.util.Scanner;
+
+import Server.Server;
+
+public class Client {
+	private Socket socket;
+	private BufferedReader reader;
+	private PrintWriter writer;
+	private String username;
+	private boolean isUsernameTaken = true;
+	private String lastMessage;
+	
+	public Client(String address, int port, String username) {
+		try {
+			this.socket = new Socket(address, port);
+			this.username = username;
+			
+			OutputStream output = socket.getOutputStream();
+			writer = new PrintWriter(output, true);
+			
+			InputStream input = socket.getInputStream();
+			reader = new BufferedReader(new InputStreamReader(input));
+			
+			writer.println(username);
+			
+			String usernameAvailable = reader.readLine();
+			if("USERNAME_AVAILABLE".equals(usernameAvailable)) {
+				System.out.println("username is still available");
+				isUsernameTaken = false;
+			} else if("USERNAME_TAKEN".equals(usernameAvailable)) {
+				System.out.println("Username is already taken.");
+				socket.close();
+			}
+			
+			if(!isUsernameTaken) new Thread(this::listenForMessages).start();
+			
+			
+//			handleSendingMessage();
+		} catch(UnknownHostException e) {
+			System.out.println("Sever not found: " + e.getMessage());
+		} catch(IOException e) {
+			System.out.println("I/O error: " + e.getMessage());
+		}
+	}
+	
+    public boolean getIsUsernameTaken() {
+    	System.out.println(isUsernameTaken);
+        return isUsernameTaken;
+    }
+	
+	private void listenForMessages() {
+		String message;
+		try {
+			while((message = reader.readLine()) != null) {
+				System.out.println(message);
+				this.lastMessage = message;
+			}
+		} catch(IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public String getLastMessage() {
+		return this.lastMessage();
+	}
+	
+	public void sendMessage(String message) {
+		writer.println(message);
+	}
+	
+	private void handleSendingMessage() {
+		Scanner scanner = new Scanner(System.in);
+		
+		try {
+			System.out.println("Enter username here: ");
+			username = scanner.nextLine();
+			writer.println(username);
+			
+			String message;
+			do {
+				System.out.println("[" + username + "]: ");
+				message = scanner.nextLine();
+				
+				writer.println(message);
+			} while(!message.equalsIgnoreCase("exit"));
+			
+		} finally {
+			scanner.close();
+		}
+		
+		try {
+			socket.close();
+		} catch(IOException e) {
+			System.out.println("Error closing connection: " + e.getMessage());
+		}
+	}
+
+	private class ReadThread implements Runnable {
+		@Override
+		public void run() {
+			try {
+				String serverMessage;
+				while((serverMessage = reader.readLine()) != null) {
+					System.out.println(serverMessage);
+				}
+			} catch(IOException e) {
+				System.out.println("Error reading from the sever: " + e.getMessage());
+			}
+		}
+	}
+
+//	public static void main(String[] args) {
+//		String hostname = "localhost";
+//		int port = 1234;
+//		
+//		new Client(hostname, port);
+//	}
+
+}

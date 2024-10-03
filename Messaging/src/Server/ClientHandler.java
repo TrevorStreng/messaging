@@ -46,7 +46,7 @@ class ClientHandler implements Runnable {
 
 	private void handleMessage(String message) {
 		System.out.println("HandleMessage: " + message);
-		String[] tokens = message.split(" ", 3);
+		String[] tokens = message.split(" ", 2);
 		String recipient = tokens[0];
 		String dm = tokens[1];
 		

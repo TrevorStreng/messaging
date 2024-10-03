@@ -3,6 +3,7 @@ package application;
 import java.util.Set;
 
 import Client.Client;
+import Client.MessageListener;
 import Server.Server;
 import javafx.application.Application;
 import javafx.stage.Stage;
@@ -13,13 +14,15 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 
 
-public class Main extends Application {
+public class Main extends Application implements MessageListener {
 	private Client client;
+	private TextArea messageDisplay;
+	
 	@Override
 	public void start(Stage primaryStage) {
 		try {
 	        // Create UI components
-	        TextArea messageDisplay = new TextArea();
+	        messageDisplay = new TextArea();
 	        messageDisplay.setEditable(false);
 	        TextField messageInput = new TextField();
 	        Button sendButton = new Button("Send");
@@ -58,7 +61,7 @@ public class Main extends Application {
 	    submitButton.setOnAction(e -> {
 	    	String username = usernameInput.getText();
 	    	System.out.println(username);
-	    	client = new Client("localhost", 1234, username);
+	    	client = new Client("localhost", 1234, username, this);
 	    	
 	    	// check if username is in use and display an error message if it is
 	    	if(client.getIsUsernameTaken()) {
@@ -83,6 +86,14 @@ public class Main extends Application {
 	    parentStage.setScene(usernameScene);
 	    parentStage.show();
 	}
+	
+    @Override
+    public void onMessageReceived(String message) {
+        // Update the UI with the new message (on the JavaFX Application Thread)
+        javafx.application.Platform.runLater(() -> {
+            messageDisplay.appendText("Dm: " + message + "\n");
+        });
+    }
 	
 	public static void main(String[] args) {
 		launch(args);		

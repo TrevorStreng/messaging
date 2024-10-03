@@ -7,4 +7,5 @@
     <fullyQualifiedTypeName name="java.util.Set"/>
     <fullyQualifiedTypeName name="Server.Server"/>
     <fullyQualifiedTypeName name="javafx.scene.text.Text"/>
+    <fullyQualifiedTypeName name="application.MessageListener"/>
 </qualifiedTypeNameHistroy>
